@@ -22,8 +22,11 @@ with open(INPUT_CSV, 'r') as reader:
     # Iterates over every line, saving the year and rating from every film
     for line in read:
         data_dict[line["Year"]].append(float(line["Rating"]))
-# Saves the average rating and total frequecy for every year
+# Saves the average rating for every year
 rating = [sum(data_dict[key]) / len(data_dict[key]) for key in data_dict]
+# Since the average rating for a year is a very minimal amount of information,
+# I added a bar for the amount of films from a specific year that made it into
+# the top 50, giving the rating more legitimacy.
 frequency = [len(data_dict[key]) for key in data_dict]
 
 # Bar plot adapted from https://matplotlib.org/examples/api/barchart_demo.html
