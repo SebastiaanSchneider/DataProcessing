@@ -4,17 +4,19 @@
 """
 This script scrapes IMDB and outputs a CSV file with highest rated movies.
 """
-
-import csv
-import re
+from bs4 import BeautifulSoup
+from contextlib import closing
 from requests import get
 from requests.exceptions import RequestException
-from contextlib import closing
-from bs4 import BeautifulSoup
+import csv
+import re
 
-TARGET_URL = "https://www.imdb.com/search/title?title_type=feature&release_date=2008-01-01,2018-01-01&num_votes=5000,&sort=user_rating,desc"
+
+TARGET_URL = "https://www.imdb.com/search/title?title_type=feature&release_\
+date=2008-01-01,2018-01-01&num_votes=5000,&sort=user_rating,desc"
 BACKUP_HTML = 'movies.html'
 OUTPUT_CSV = 'movies.csv'
+
 
 def extract_movies(dom):
     # Creates an empty list that will hold the movies
@@ -22,10 +24,12 @@ def extract_movies(dom):
     # Iterates over every film, getting the five details required
     for film in dom.find_all("div", class_="lister-item mode-advanced"):
         title = film.h3.a.string
-        year = re.sub('\D', '', film.find("span", class_="lister-item-year text-muted unbold").string)
+        year = re.sub('\D', '', film.find("span", \
+               class_="lister-item-year text-muted unbold").string)
         runtime = film.find("span", class_="runtime").string.strip(" min")
         rating = film.strong.string
-        ding = film.find('p', class_="sort-num_votes-visible").previous_sibling.previous_sibling
+        ding = film.find('p', class_="sort-num_votes-visible")\
+              .previous_sibling.previous_sibling
         if "Stars" in ding.text:
             actors = ding.select("a[href*=?ref_=adv_li_st]")
             for i in range(len(actors)):

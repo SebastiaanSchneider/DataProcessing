@@ -50,6 +50,7 @@ ax.set_xticks(ind + width / 2)
 ax.set_xticklabels(sorted(data_dict))
 ax.legend((bar1[0], bar2[0]), ('Average rating', 'Frequency'))
 
+
 # Adds a numbber above every bar, to make it more readable
 def autolabel(bars):
     """
@@ -65,6 +66,7 @@ def autolabel(bars):
             ax.text(bar.get_x() + bar.get_width()/2., height + .16,
                     '%d' % int(height),
                     ha='center', va='bottom')
+
 
 # Runs the labeling function on the bars
 autolabel(bar1)
