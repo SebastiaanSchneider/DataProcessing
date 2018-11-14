@@ -79,22 +79,28 @@ def write_json():
 # Calculates the central tendency from the GDP data, and puts the GDP data into
 # a histogram
 def process_gdp():
+    print("The mean, median, and modal GDP are, respectively:")
     print(df["GDP"].mean())
     print(df["GDP"].median())
     print(df["GDP"].mode()[0])
     df["GDP"].plot.hist(25)
+    plt.xlabel("GDP ($ per capita) dollars")
+    plt.ylabel("Amount of countries in range")
     plt.show()
 
 
 # Calculates the five number summary from the Infant mortality data and creates
 # a box plot from the data
 def process_mortality():
+    print("The lowest, first quantile, median, third quantile, and highest \
+Infant Mortality rates are, respectively:")
     print(df["Infant mortality"].min())
     print(df["Infant mortality"].quantile(.25))
     print(df["Infant mortality"].median())
     print(df["Infant mortality"].quantile(.75))
     print(df["Infant mortality"].max())
     df["Infant mortality"].plot.box()
+    plt.xlabel("(per 1000 births)")
     plt.show()
 
 
@@ -104,7 +110,10 @@ def comparison():
     x = df["GDP"]
     y = df["Infant mortality"]
     plt.scatter(x, y, alpha=0.5)
+    plt.xlabel("GDP ($ per capita) dollars")
+    plt.ylabel("Infant mortality (per 1000 births)")
     plt.show()
+
 # I attempted to use seaborn to make this plot, but kept getting errors for
 # missing files, so I switched to matplotlib. I'd still like to know what went
 # wrong here!
