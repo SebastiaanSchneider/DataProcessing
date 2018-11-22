@@ -3,4 +3,4 @@ Name: Sebastiaan Schneider
 Student number: 10554769
 
 
-http(s)://<lamapeloeza>.github.io/<DataProcessing>
+https://<lamapeloeza>.github.io/<DataProcessing>
