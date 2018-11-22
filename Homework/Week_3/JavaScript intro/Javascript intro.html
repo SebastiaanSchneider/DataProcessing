@@ -1,0 +1,65 @@
+<!-- Name: Sebastiaan Schneider
+Student number: 10554769 -->
+
+
+<head>
+	<title>This took way too long to make</title>
+</head>
+
+<body>
+	<canvas id="myCanvas"></canvas>
+  <script>
+		// Opens the JSON file with data. Something weird happened with
+		// the name data.json, so I renamed it n.json
+    var fileName = "n.json";
+    var txtFile = new XMLHttpRequest();
+    txtFile.onreadystatechange = function() {
+      if (txtFile.readyState === 4 && txtFile.status == 200) {
+				// Save JSON data in usable variables
+        var data = JSON.parse(txtFile.responseText);
+				var keys = Object.keys(data);
+        var values = Object.values(data);
+
+				// Calls the canvas element
+				var canvas = document.getElementById('myCanvas');
+				var ctx = canvas.getContext('2d');
+
+				// Sets the range of the element to be adaptable to the user
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+
+				//Sets the color for all things drawn on the canvas
+				ctx.fillStyle = 'rgb(200,0,0)';
+
+				// Draws a rectangle aroung the canvas
+				void ctx.strokeRect(0, 0, canvas.width, canvas.height * .75);
+
+				// A few variables used for the drawing process
+				var counter = 0
+				var xAxis = 0;
+				var yAxis = 0;
+
+				// Iterates over every item in the JSON file,
+				// drawing a line to the value
+				keys.forEach(function (key){
+					// Sets the coordinates for the end point of the line
+					xAxis = (counter + .25) / 45 * canvas.width;
+					yAxis = values[counter] * 10;
+
+					// Draws the line, and moves the "pointer" to that coordinate
+					ctx.lineTo(xAxis, yAxis);
+					ctx.stroke();
+					ctx.moveTo(xAxis, yAxis);
+
+					// Draws a small circle on the coordinate
+					ctx.arc(xAxis, yAxis, 2, 0, 2*Math.PI);
+					ctx.stroke();
+
+					// Increases the counter to prepare for the next line
+					counter += 1;
+				})
+    }}
+    txtFile.open("GET", fileName);
+    txtFile.send();
+  </script>
+</body>

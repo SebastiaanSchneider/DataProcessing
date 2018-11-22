@@ -4,32 +4,47 @@
 
 import csv
 import json
+import re
 
 
 def preprocessing():
-    movies = []
+    # Prepare the overal dictionary that will become the basis for the JSON
+    movies = {}
     try:
+        # Open the CSV file and the the items in it. Only two of the items
+        # being read here are saved
         with open("Section6-Homework-Data.csv", 'r') as reader:
             data = csv.DictReader(reader)
             for row in data:
                 movie = row["Movie Title"]
                 studio = row["Studio"]
-                release = row["Release Date"]
+                # Saves the year the movie was released in a usable format
+                release = row["Release Date"][-2:]
+                if int(release) < 20:
+                    year = f"20{release}"
+                else:
+                    year = f"19{release}"
                 genre = row["Genre"]
                 runtime = row["Runtime (min)"]
                 budget = row["Budget ($mill)"]
                 gross = row["Gross ($mill)"]
-                adj_gross = row["Adjusted Gross ($mill)"]
+                # Adjusts the gross to a number that is more practical in use
+                adj_gross = float(re.sub('\D', '',
+                                  row["Adjusted Gross ($mill)"])) / 10000
                 rating = row["IMDb Rating"]
-                list = ([movie, studio, release, genre, runtime, budget, gross,
-                        adj_gross, rating])
-                movies.append(list)
+                # Checks if there are already movies from that year
+                # in the dict and, if so, calculates the combined gross
+                if year in movies:
+                    movies[year] = movies[year] + adj_gross
+                else:
+                    movies[year] = adj_gross
         print("Succesfully pre-processed data!")
         return movies
     except ImportError or IOError:
         print("Failed to pre-process data")
 
 
+# This was not used in this assignment, but in the previous one
 def filter_write(movies):
     try:
         with open("data.csv", 'w', newline='') as f:
@@ -44,14 +59,9 @@ def filter_write(movies):
         print("Failed to write data.csv")
 
 
-def json_write(movies):
-    jsondict = {}
-    for film in movies:
-        jsondict[film[0]] = {"Studio": film[1], "Release Date": film[2],
-                             "Genre": film[3], "Runtime": film[4],
-                             "Budget": film[5], "Adjusted Gross": film[6],
-                             "Gross": film[7], "IMDb Rating": film[8]}
-
+# Writes the dict to a JSON file
+def json_write(years):
+    jsondict = years
     try:
         with open("data.json", 'w') as output:
             json.dump(jsondict, output)
@@ -60,7 +70,9 @@ def json_write(movies):
         print("Failed to write data.json")
 
 
+# Runs the code
 if __name__ == "__main__":
     data = preprocessing()
-    filter_write(data)
+    print(data)
+    # filter_write(data)
     json_write(data)
