@@ -1,0 +1,172 @@
+<!-- Name: Sebastiaan Schneider
+Student number: 10554769 -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <style type="text/css">
+      .toolTip {
+        position: absolute;
+        display: none;
+        min-width: 80px;
+        height: auto;
+        background: none repeat scroll 0 0 #ffffff;
+        border: 1px solid #6F257F;
+        padding: 14px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+      d3.select("head").append("title").text("D3 Barchart");
+      d3.select("body").append("p").text("Graph of political decisions");
+      var svg = d3.select("body").append("svg");
+      d3.select("body").append("footer")
+        .text("This graph shows decisions about renewable energy or something");
+      d3.select("body").append("footer")
+        .text("Made by Sebastiaan Schneider, student number: 10554769");
+
+        // var countries = [];
+        // d3.json("data.json").then(function(data){
+        // 	for (key of Object.keys(data)){
+        //     if (!countries.includes(data[key].LOCATION)){
+        //       countries.push(data[key].LOCATION)
+        //     }
+        //   }
+        // })
+        // console.log(countries)
+        // var dropdownChange = function() {
+        //               var newCereal = d3.select(this).property('value'),
+        //                   newData   = cerealMap[newCereal];
+        //
+        //               updateBars(newData);
+        //           };
+        //
+        //           // Get names of cereals, for dropdown
+        //           var cereals = Object.keys(cerealMap).sort();
+        //
+        //           var dropdown = d3.select("#vis-container")
+        //               .insert("select", "svg")
+        //               .on("change", dropdownChange);
+        //
+        //           dropdown.selectAll("option")
+        //               .data(cereals)
+        //             .enter().append("option")
+        //               .attr("value", function (d) { return d; })
+        //               .text()
+
+      var list = [];
+      var item = [];
+      d3.json("data.json").then(function(data){
+      	for (key of Object.keys(data)){
+          if (data[key].LOCATION ===  "AUS" && data[key].MEASURE === "KTOE"){
+            item = [parseInt(data[key].TIME), parseFloat(data[key].Value)]
+            list.push(item);
+          }
+        }
+
+        var amount = list.length
+        var width = 900;
+        var height = 450;
+        var margin = {top: height * 0.05, bottom: height * 0.1,
+            left: width* 0.075, right: width * 0.01}
+        var chartWidth = width - margin.left - margin.right;
+        var chartHeight = height - margin.top - margin.bottom;
+
+        svg.attr("width", width).attr("height", height);
+        svg.append("rect").attr("width", "100%").attr("height", "100%")
+          .attr("fill", "lavender").attr("opacity", 0.75);
+
+        var lowYear = d3.min(list, function(d){
+                                     return d[0];
+                                   });
+        var highYear = d3.max(list, function(d){
+                                      return d[0];
+                                    });
+        var minValue = d3.min(list, function(d){
+                                      return d[1];
+                                    });
+        var maxValue = d3.max(list, function(d){
+                                      return d[1];
+                                    });
+
+        var barWidth = chartWidth / amount;
+        var barHeight = chartHeight / maxValue;
+
+        var xScale = d3.scaleLinear().domain([lowYear, highYear])
+                      .range([margin.left, chartWidth - margin.right]);
+        var yScale = d3.scaleLinear().domain([0, maxValue])
+                      .range([chartHeight, margin.top]);
+        var bars = svg.selectAll("rect").data(list).enter().append("rect");
+
+        var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+        console.log(bars)
+        bars.attr("x", function(d){
+                        return xScale(d[0]);
+                       })
+          .attr("y", function(d){
+                        return yScale(d[1]) + margin.top;
+                      })
+          .attr("width", barWidth)
+          .attr("opacity", 0.75)
+          .attr("height", function(d){
+                            return chartHeight - yScale(d[1]);
+                          })
+          .attr("fill", function(d) {
+                          return "purple"
+                        })
+          .on("mousemove", function(d){
+                            tooltip.style("left", d3.event.pageX - 50 + "px")
+                              .style("top", d3.event.pageY - 70 + "px")
+                              .style("display", "inline-block")
+                              .html(d[1] +", year: "+ d[0] );
+                            })
+        	 .on("mouseout", function(d){
+                            tooltip.style("display", "none");
+                            d3.select(this).attr("fill", "purple")
+                            })
+            // Allows for the bar-color changing. credit to phil-pedruco
+           .on("mouseover", function() {
+                              d3.select(this).attr("fill", "red");
+                            })
+
+        var xAxis = d3.axisBottom()
+                      .scale(xScale)
+                      .tickFormat(d3.format("d"));
+        var yAxis = d3.axisLeft()
+                      .scale(yScale).tickFormat(d3.format("d"));
+        // creates the X-axis
+        svg.append("g").attr("transform", "translate("+
+          (xScale(lowYear) + barWidth - margin.left) + "," +
+          (chartHeight + margin.top) + ")")
+           .call(xAxis);
+        // creates the Y-axis
+        svg.append("g").attr("transform", "translate("+
+          (margin.left + margin.right) + "," + (yScale(maxValue)) + ")")
+            .call(yAxis);
+
+        svg.append("text")
+          .attr("transform", "translate(" + (width / 2) + ","
+                                          + (height * 0.05) + ")")
+          .style("text-anchor", "middle")
+          .text("The amounts of KTOE used in a country by year");
+        // creates the X-axis label
+        svg.append("text")
+          .attr("transform", "translate(" + (width / 2) + ","
+                                          + (height * 0.98) + ")")
+          .style("text-anchor", "middle")
+          .text("Time in years");
+        // creates the Y-axis label
+        svg.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", margin.left / 2)
+          .attr("x", 0 - (height / 2))
+          .style("text-anchor", "middle")
+          .text("The amount of KTOE used in AUS");
+        })
+    </script>
+  </body>
+</html>
