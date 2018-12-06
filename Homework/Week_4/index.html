@@ -1,12 +1,24 @@
 <!-- Name: Sebastiaan Schneider
 Student number: 10554769 -->
 
+<!-- Code for the toolTip was taken from:
+https://bl.ocks.org/alandunning/274bf248fd0f362d64674920e85c1eb7 -->
+
+<!-- Code used to change a bar's color on hover was taken from:
+http://bl.ocks.org/phil-pedruco/9032348 -->
+
+<!-- Some credit also goes to fellow student Julian Evalle, who gave me tips on
+where to find a lot of the functions I used. I thought out the logic and order
+used below for myself, but our code may still look a lot alike because of that
+-->
+
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <script type="text/javascript" src="d3/d3.js"></script>
     <style type="text/css">
+      /* Prepares the use of .toolTip */
       .toolTip {
         position: absolute;
         display: none;
@@ -17,69 +29,97 @@ Student number: 10554769 -->
         padding: 14px;
         text-align: center;
       }
+      /* Should be formatting the footers on this page */
+      .footer {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <script type="text/javascript">
+      // Adds the elements to the page
       d3.select("head").append("title").text("D3 Barchart");
       d3.select("body").append("p").text("Graph of political decisions");
       var svg = d3.select("body").append("svg");
-      d3.select("body").append("footer")
-        .text("This graph shows decisions about renewable energy or something");
+      d3.select("body").append("p")
+        .text("This graph shows how countries handle their energy needs");
       d3.select("body").append("footer")
         .text("Made by Sebastiaan Schneider, student number: 10554769");
 
-        // var countries = [];
-        // d3.json("data.json").then(function(data){
-        // 	for (key of Object.keys(data)){
-        //     if (!countries.includes(data[key].LOCATION)){
-        //       countries.push(data[key].LOCATION)
-        //     }
-        //   }
-        // })
-        // console.log(countries)
-        // var dropdownChange = function() {
-        //               var newCereal = d3.select(this).property('value'),
-        //                   newData   = cerealMap[newCereal];
-        //
-        //               updateBars(newData);
-        //           };
-        //
-        //           // Get names of cereals, for dropdown
-        //           var cereals = Object.keys(cerealMap).sort();
-        //
-        //           var dropdown = d3.select("#vis-container")
-        //               .insert("select", "svg")
-        //               .on("change", dropdownChange);
-        //
-        //           dropdown.selectAll("option")
-        //               .data(cereals)
-        //             .enter().append("option")
-        //               .attr("value", function (d) { return d; })
-        //               .text()
+      // Creates the toolTip
+      var tooltip = d3.select("body").append("div").attr("class", "toolTip");
 
+// I was meaning to add a drop down menu to the chart, to allow users to choose
+// the country and measure they're interested in, but couldn't manage to get it
+// to work in time. I'll try to fix it later on, so I left it in for now, but
+// please ignore this comment block!
+      // var countries = [];
+      // d3.json("data.json").then(function(data){
+      // 	for (key of Object.keys(data)){
+      //     if (!countries.includes(data[key].LOCATION)){
+      //       countries.push(data[key].LOCATION)
+      //     }
+      //   }
+      // })
+      // console.log(countries)
+      // var dropdownChange = function() {
+      //               var newCereal = d3.select(this).property('value'),
+      //                   newData   = cerealMap[newCereal];
+      //
+      //               updateBars(newData);
+      //           };
+      //
+      //           // Get names of cereals, for dropdown
+      //           var cereals = Object.keys(cerealMap).sort();
+      //
+      //           var dropdown = d3.select("#vis-container")
+      //               .insert("select", "svg")
+      //               .on("change", dropdownChange);
+      //
+      //           dropdown.selectAll("option")
+      //               .data(cereals)
+      //             .enter().append("option")
+      //               .attr("value", function (d) { return d; })
+      //               .text()
+
+
+      // Initializes two variables that are used to store the chart data
       var list = [];
       var item = [];
+
+      // Opens and reads the JSON containing the data
       d3.json("data.json").then(function(data){
-      	for (key of Object.keys(data)){
+        // Checks every object in the JSON and, if it fits the criterea,
+        // saves it
+        for (key of Object.keys(data)){
           if (data[key].LOCATION ===  "AUS" && data[key].MEASURE === "KTOE"){
             item = [parseInt(data[key].TIME), parseFloat(data[key].Value)]
             list.push(item);
           }
         }
 
+      // Initializes a number of variables used in drawing the graph
+        // Total amount of bars
         var amount = list.length
+        // Size of the svg
         var width = 900;
         var height = 450;
+        // Margins within which the actual chart will go
         var margin = {top: height * 0.05, bottom: height * 0.1,
             left: width* 0.075, right: width * 0.01}
+        // Size of the chart
         var chartWidth = width - margin.left - margin.right;
         var chartHeight = height - margin.top - margin.bottom;
-
+        // Gives the svg element its attributes
         svg.attr("width", width).attr("height", height);
         svg.append("rect").attr("width", "100%").attr("height", "100%")
           .attr("fill", "lavender").attr("opacity", 0.75);
 
+        // These collect the lowest and highest values for the x and y axes
         var lowYear = d3.min(list, function(d){
                                      return d[0];
                                    });
@@ -93,80 +133,94 @@ Student number: 10554769 -->
                                       return d[1];
                                     });
 
+        // Prepares to calculate the width and height of every bar
         var barWidth = chartWidth / amount;
         var barHeight = chartHeight / maxValue;
 
+        // Creates the scales for placing the bars
         var xScale = d3.scaleLinear().domain([lowYear, highYear])
                       .range([margin.left, chartWidth - margin.right]);
         var yScale = d3.scaleLinear().domain([0, maxValue])
                       .range([chartHeight, margin.top]);
+
+        // Creates a rect for every data item collecting from the JSON
         var bars = svg.selectAll("rect").data(list).enter().append("rect");
 
-        var tooltip = d3.select("body").append("div").attr("class", "toolTip");
-        console.log(bars)
+      // Gives shape to the rects to make them into the desired bars
+        // Finds the x coordinate at which to start drawing the bar
         bars.attr("x", function(d){
                         return xScale(d[0]);
                        })
+          // Finds the y coordinate at which to start drawing the bar
           .attr("y", function(d){
                         return yScale(d[1]) + margin.top;
                       })
+          // Gives the bar its width
           .attr("width", barWidth)
+          // Makes the bar a little less bright, and nicer to look at
           .attr("opacity", 0.75)
+          // Calculates to total height of the bar, through the scale
           .attr("height", function(d){
                             return chartHeight - yScale(d[1]);
                           })
+          // Actually makes the bar appear, being purple
           .attr("fill", function(d) {
                           return "purple"
                         })
+          // Makes the toolTip appear and display useful information,
+          // in the event the mouse touches the bar
           .on("mousemove", function(d){
                             tooltip.style("left", d3.event.pageX - 50 + "px")
                               .style("top", d3.event.pageY - 70 + "px")
                               .style("display", "inline-block")
                               .html(d[1] +", year: "+ d[0] );
                             })
-        	 .on("mouseout", function(d){
-                            tooltip.style("display", "none");
-                            d3.select(this).attr("fill", "purple")
-                            })
-            // Allows for the bar-color changing. credit to phil-pedruco
-           .on("mouseover", function() {
-                              d3.select(this).attr("fill", "red");
-                            })
-
+          // Changes the bar to blue when the mouse hovers over it
+          .on("mouseover", function() {
+                            d3.select(this).attr("fill", "blue");
+                           })
+          // Turns the bar back to it's original color when the mouse leaves
+          .on("mouseout", function(d){
+                           tooltip.style("display", "none");
+                           d3.select(this).attr("fill", "purple")
+                          })
+        // Prepares the axes
         var xAxis = d3.axisBottom()
                       .scale(xScale)
                       .tickFormat(d3.format("d"));
         var yAxis = d3.axisLeft()
                       .scale(yScale).tickFormat(d3.format("d"));
-        // creates the X-axis
+        // Draws the axes
         svg.append("g").attr("transform", "translate("+
           (xScale(lowYear) + barWidth - margin.left) + "," +
           (chartHeight + margin.top) + ")")
            .call(xAxis);
-        // creates the Y-axis
         svg.append("g").attr("transform", "translate("+
           (margin.left + margin.right) + "," + (yScale(maxValue)) + ")")
             .call(yAxis);
 
+        // Adds a texts block above the chart
         svg.append("text")
           .attr("transform", "translate(" + (width / 2) + ","
                                           + (height * 0.05) + ")")
           .style("text-anchor", "middle")
-          .text("The amounts of KTOE used in a country by year");
-        // creates the X-axis label
+          .text("Energy resource statistics for Australia by year");
+
+        // Adds a text block along the x axis
         svg.append("text")
           .attr("transform", "translate(" + (width / 2) + ","
                                           + (height * 0.98) + ")")
           .style("text-anchor", "middle")
           .text("Time in years");
-        // creates the Y-axis label
+
+        // Adds a text block along the y axis
         svg.append("text")
           .attr("transform", "rotate(-90)")
           .attr("y", margin.left / 2)
           .attr("x", 0 - (height / 2))
           .style("text-anchor", "middle")
-          .text("The amount of KTOE used in AUS");
-        })
+          .text("The amount of KTOE used");
+      })
     </script>
   </body>
 </html>
