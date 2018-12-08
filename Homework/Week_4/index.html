@@ -44,6 +44,7 @@ used below for myself, but our code may still look a lot alike because of that
       // Adds the elements to the page
       d3.select("head").append("title").text("D3 Barchart");
       d3.select("body").append("p").text("Graph of political decisions");
+      var svg = d3.select("body").append("svg");
 
       // Creates the toolTip
       var tooltip = d3.select("body").append("div").attr("class", "toolTip");
@@ -70,18 +71,18 @@ used below for myself, but our code may still look a lot alike because of that
         	.append('option')
       		.text(function (d) { return d; });
 
+          // Adds two more text elements (placed down here for a neater order)
+          d3.select("body").append("p")
+            .text("This graph shows how countries handle their energy needs");
+          d3.select("body").append("footer")
+            .text("Made by Sebastiaan Schneider, student number: 10554769");
+
         // Reactivates drawChart, with the new input
         function countryChange() {
           country = d3.select('select').attr("class", "countryChoice").property('value')
           drawChart(country, measure, 1)
         };
 
-        var svg = d3.select("body").append("svg");
-        d3.select("body").append("p")
-          .text("This graph shows how countries handle their energy needs");
-        d3.select("body").append("footer")
-          .text("Made by Sebastiaan Schneider, student number: 10554769");
-          
         // var measures = [];
         // for (key of Object.keys(data)){
         //   if (!measures.includes(data[key].MEASURE)){
