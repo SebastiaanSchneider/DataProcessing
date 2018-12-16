@@ -9,8 +9,8 @@ var countryMenu = d3.select("body").append("div");
 var timeMenu = d3.select("body").append("div");
 d3.select("body").append("p").text("Some data may be missing!").style("color", "red");
 d3.select("body").append("p").text("Sources:");
-d3.select("body").append("p").text("https://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015");
-d3.select("body").append("p").text("https://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015");
+d3.select("body").append("p").text("http://stats.oecd.org/SDMX-JSON/data/MSTI_PUB/TH_WRXRS.FRA+DEU+KOR+NLD+PRT+GBR/all?startTime=2007&endTime=2015");
+d3.select("body").append("p").text("http://stats.oecd.org/SDMX-JSON/data/HH_DASH/FRA+DEU+KOR+NLD+PRT+GBR.COCONF.A/all?startTime=2007&endTime=2015");
 d3.select("body").append("footer").text("Made by Sebastiaan Schneider, student number: 10554769");
 
 
