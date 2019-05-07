@@ -32,7 +32,7 @@ Student number: 10554769 -->
 				ctx.fillStyle = 'rgb(200,0,0)';
 
 				// Draws a rectangle around the canvas
-				void ctx.strokeRect(0, 0, canvas.width, canvas.height);
+				void ctx.strokeRect(30, 0, canvas.width, canvas.height);
 
 				// A few variables used for the drawing process
 				var counter = 0
@@ -43,7 +43,7 @@ Student number: 10554769 -->
 				// drawing a line to the value
 				keys.forEach(function (key){
 					// Sets the coordinates for the end point of the line
-					xAxis = (counter + .25) / 45 * canvas.width;
+					xAxis = ((counter + .25) / 45 * canvas.width) + 30;
 					yAxis = canvas.height - values[counter] * 10;
 
 					// Draws the line, and moves the "pointer" to that coordinate
