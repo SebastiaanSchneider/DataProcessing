@@ -44,7 +44,7 @@ Student number: 10554769 -->
 				keys.forEach(function (key){
 					// Sets the coordinates for the end point of the line
 					xAxis = (counter + .25) / 45 * canvas.width;
-					yAxis = (canvas.height * .75) - (values[counter] * 10);
+					yAxis = (canvas.height * .75) - (values[counter]);
 
 					// Draws the line, and moves the "pointer" to that coordinate
 					ctx.lineTo(xAxis, yAxis);
